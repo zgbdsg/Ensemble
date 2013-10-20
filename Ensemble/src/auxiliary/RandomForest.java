@@ -5,6 +5,7 @@
 package auxiliary;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -39,6 +40,8 @@ public class RandomForest extends Classifier {
             permutation[repInd] = tmp;
         }
         
+        System.out.println(Arrays.toString(permutation));
+        
         int length = features.length/5;
         double[][] bagfeatures = new double[length][features[0].clone().length];
         double[] baglabels = new double[length];
@@ -52,9 +55,7 @@ public class RandomForest extends Classifier {
         		bagfeatures[j] = features[i*length+j];
         		baglabels[j] = labels[i*length+j];
         	}
-        }
-        
-        for(int i=0;i<Treenum;i ++){
+        	
         	forest[i].train(isCategory, bagfeatures, baglabels);
         }
     }
@@ -64,7 +65,29 @@ public class RandomForest extends Classifier {
     	List<Object> result = new ArrayList<Object>();
     	double[] predict = new double[Treenum];
     	
+    	int hasit=0;
+    	for(int i=0;i<Treenum;i ++){
+    		double tmp = forest[i].predict(features);
+    		if(result.indexOf((Object)tmp) < 0)
+    			result.add(tmp);
+    		predict[i] = tmp;
+    	}
     	
-        return 0;
+    	int[] num = new int[result.size()];
+    	for(int i=0;i<result.size();i ++){
+    		for(int j=0;j<Treenum;j ++){
+    			if(predict[j] == (double)result.get(i)){
+    				num[i] ++;
+    			}
+    		}
+    	}
+    	
+    	int max=0;
+    	for(int i=0;i<result.size();i ++){
+    		if(num[i]>num[max])
+    			max = i;
+    	}
+    	
+        return (double)result.get(max);
     }
 }
