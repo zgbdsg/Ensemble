@@ -40,10 +40,10 @@ public class RandomForest extends Classifier {
             permutation[repInd] = tmp;
         }
         
-        System.out.println(Arrays.toString(permutation));
+        //System.out.println(Arrays.toString(permutation));
         
-        int length = features.length/5;
-        double[][] bagfeatures = new double[length][features[0].clone().length];
+        int length = features.length/Treenum;
+        double[][] bagfeatures = new double[length][features[0].length];
         double[] baglabels = new double[length];
         
         for(int i=0;i<Treenum;i ++){

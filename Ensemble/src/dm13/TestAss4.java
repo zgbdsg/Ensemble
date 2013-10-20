@@ -22,10 +22,10 @@ public class TestAss4 {
 
             // conduct 10-cv 
             Evaluation eva = new Evaluation(dataset, "RandomForest");
-            eva.crossValidation();
+            //eva.crossValidation();
 
             // print mean and standard deviation of accuracy
-            System.out.println("Dataset:" + path + ", mean and standard deviation of accuracy:" + eva.getAccMean() + "," + eva.getAccStd());
+            //System.out.println("Dataset:" + path + ", mean and standard deviation of accuracy:" + eva.getAccMean() + "," + eva.getAccStd());
         }
 
         // for AdaBoost

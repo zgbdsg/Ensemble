@@ -2,35 +2,27 @@ package auxiliary;
 
 import java.util.*;
 
-/**
- *
- * @author MF1333020 孔繁宇
- */
-
-//决策树节点结构
 class ATreeNode {
-    int[] set;                         //样本下标集合
-    int[] attr_index;                  //可用属性下标集合
-    double label;                      //标签
-    int split_attr;                    //该节点用于分割的属性下标
-    double[] split_points;             //切割点 离散属性为多值，连续属性只有一个值
-    ATreeNode[] childrenNodes;          //子节点
+    int[] set;
+    int[] attr_index;
+    double label;
+    int split_attr; 
+    double[] split_points;
+    ATreeNode[] childrenNodes;
 }
 
-//存储分割信息
 class ASplitData {
     int split_attr;
     double[] split_points;
-    int[][] split_sets;                //分割后新的样本集合的数组
+    int[][] split_sets; 
 }
 
 class ABundleData {
-    double floatValue;                 //存储增益率或MSE
+    double floatValue; 
     ASplitData split_info;
 }
 
-//当分割出现错误时抛出此异常
-class SplitException extends Exception {
+class ASplitException extends Exception {
 }
 
 public class ADecisionTree extends Classifier {
@@ -281,7 +273,7 @@ public class ADecisionTree extends Classifier {
                         reference_value = gain_ratio_info.floatValue;
                         result = gain_ratio_info.split_info;
                     }
-                } catch (SplitException ex) { //捕获异常，直接丢弃
+                } catch (ASplitException ex) { //捕获异常，直接丢弃
                 }
             }
         } else {
@@ -292,14 +284,14 @@ public class ADecisionTree extends Classifier {
                         reference_value = mse_info.floatValue;
                         result = mse_info.split_info;
                     }
-                } catch (SplitException ex) {
+                } catch (ASplitException ex) {
                 }
             }
         }
         return result;
     }
     
-    private ASplitData split_with_attribute(int[] set, int attribute) throws SplitException {
+    private ASplitData split_with_attribute(int[] set, int attribute) throws ASplitException {
         ASplitData result = new ASplitData();
         result.split_attr = attribute;
         
@@ -386,7 +378,7 @@ public class ADecisionTree extends Classifier {
                 }
             }
             //没有分割点，抛出分割异常
-            if (result.split_sets[0] == null && result.split_sets[1] == null) throw new SplitException();
+            if (result.split_sets[0] == null && result.split_sets[1] == null) throw new ASplitException();
             result.split_points = new double[1];
             result.split_points[0] = best_split_point;
         }
@@ -418,7 +410,7 @@ public class ADecisionTree extends Classifier {
     }
     
     //增益率 C4.5
-    private ABundleData gain_ratio_use_attribute(int[] set, int attribute) throws SplitException {
+    private ABundleData gain_ratio_use_attribute(int[] set, int attribute) throws ASplitException {
         ABundleData result = new ABundleData();
         double entropy_before_split = entropy(set);
         
@@ -459,7 +451,7 @@ public class ADecisionTree extends Classifier {
         return temp / set.length;
     }
     
-    private ABundleData mse_use_attribute(int[] set, int attribute) throws SplitException {
+    private ABundleData mse_use_attribute(int[] set, int attribute) throws ASplitException {
         ABundleData mse_info = new ABundleData();
         mse_info.floatValue = 0;
         mse_info.split_info = split_with_attribute(set, attribute);
