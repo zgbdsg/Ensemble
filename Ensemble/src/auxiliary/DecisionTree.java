@@ -263,10 +263,28 @@ public class DecisionTree extends Classifier {
         
         //前剪枝
         double reference_value = _isClassification ? 0.05 : -1;
-        if (node.set.length < 7) return result;
+        //if (node.set.length < 7) return result;
+        
+        int m=node.attr_index.length/2;
+        int attr_index[] = new int[m];
+        Random random = new Random(9);
+        for(int i=0;i<m;){
+        	int has_item=0;
+        	int tmp=Math.abs(random.nextInt())%node.attr_index.length;
+        	for(int j=0;j<=i;j ++){
+        		if(attr_index[j] == tmp){
+        			has_item=1;
+        			break;
+        		}
+        	}
+        	if(has_item == 0){
+        		attr_index[i] = tmp;
+        		i ++;
+        	}
+        }
         
         if (_isClassification) {
-            for (int attribute : node.attr_index) {
+            for (int attribute : attr_index) {
                 try {
                     BundleData gain_ratio_info = gain_ratio_use_attribute(node.set, attribute); //分割错误会抛出分割异常
                     if (gain_ratio_info.floatValue > reference_value) {
@@ -277,7 +295,7 @@ public class DecisionTree extends Classifier {
                 }
             }
         } else {
-            for (int attribute : node.attr_index) {
+            for (int attribute : attr_index) {
                 try {
                     BundleData mse_info = mse_use_attribute(node.set, attribute);
                     if (reference_value < 0 || mse_info.floatValue < reference_value) {
