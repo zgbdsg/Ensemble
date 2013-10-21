@@ -26,7 +26,8 @@ public class RandomForest extends Classifier {
     	Treenum = 5;
     	forest = new DecisionTree[Treenum];
     	
-    	Random random = new Random(2013);
+    	Random random = new Random(features.length);
+    	/*
         int[] permutation = new int[features.length];
         for (int i = 0; i < permutation.length; i++) {
             permutation[i] = i;
@@ -39,10 +40,11 @@ public class RandomForest extends Classifier {
             permutation[ind] = permutation[repInd];
             permutation[repInd] = tmp;
         }
+        */
         
         //System.out.println(Arrays.toString(permutation));
         
-        int length = features.length/Treenum;
+        int length = features.length;
         double[][] bagfeatures = new double[length][features[0].length];
         double[] baglabels = new double[length];
         
@@ -52,8 +54,9 @@ public class RandomForest extends Classifier {
         
         for(int i=0;i<Treenum;i ++) {
         	for(int j=0;j<length;j ++) {
-        		bagfeatures[j] = features[i*length+j];
-        		baglabels[j] = labels[i*length+j];
+        		int tmp = random.nextInt(length);
+        		bagfeatures[j] = features[tmp];
+        		baglabels[j] = labels[tmp];
         	}
         	
         	forest[i].train(isCategory, bagfeatures, baglabels);

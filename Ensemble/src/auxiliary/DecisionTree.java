@@ -267,7 +267,7 @@ public class DecisionTree extends Classifier {
         
         int m=node.attr_index.length/2;
         int attr_index[] = new int[m];
-        Random random = new Random(9);
+        Random random = new Random(node.attr_index.length);
         for(int i=0;i<m;){
         	int has_item=0;
         	int tmp=Math.abs(random.nextInt())%node.attr_index.length;

@@ -18,33 +18,33 @@ import java.util.Random;
 public class AdaBoost extends Classifier {
 
 	int k; //turns
-	int numTree;
 	ADecisionTree[] boost;
-	double[] weights;
+	double[] dataWeights;
+	double[] classifierWeights;
 	double[] errors;
 	
     public AdaBoost() {
-    	k=4;
-    	numTree = 5;
+    	k=2;
     	boost = new ADecisionTree[k];
     	errors = new double[k];
+    	classifierWeights = new double[k];
     }
 
     @Override
     public void train(boolean[] isCategory, double[][] features, double[] labels) {
 
     	int insNum = features.length;
-    	int length = insNum/numTree;
-    	weights = new double[insNum];
+    	int length = insNum/k;
+    	dataWeights = new double[insNum];
     	
     	for(int i=0;i<insNum;i ++)
-    		weights[i] = 1.0/insNum;
+    		dataWeights[i] = 1.0/insNum;
     	
     	for(int turns=0;turns<k;turns ++) {
     		
 	    	List<Object> tmpdata = new ArrayList<Object>();
 	    	for(int i=0;i<insNum;i ++){
-	    		int tmpnum = (int)(insNum*weights[i]*10);
+	    		int tmpnum = (int)(insNum*dataWeights[i]*10);
 	    		for(int j=0;j<tmpnum;j ++){
 	    			tmpdata.add(i);
 	    		}
@@ -83,36 +83,40 @@ public class AdaBoost extends Classifier {
 	       
 	       errors[turns] = 1.0*errors[turns] / (1.0*insNum);
 	       
-	       //update weights
-	       for(int i=0;i<errorindex.size();i ++){
-	    	   int index = (int)errorindex.get(i);
-	    	   if(errors[turns] < 0.5)
-	    		   weights[index] = weights[index]*errors[turns]/(1-errors[turns]);
-	    	   else
-	    		   weights[index] = 1.0/insNum;
-	       }
+	       //get turns classifier weights
+	       classifierWeights[turns] = 0.5*Math.log1p(1.0*(1-errors[turns])/(errors[turns]));
 	       
+	       //get the whole weights
 	       double sum = 0;
 	       for(int i=0;i<insNum;i ++){
-	    	   sum += weights[i];
+	    	   if(errorindex.indexOf((Object)i) >= 0)
+	    		   sum += dataWeights[i]*Math.pow(Math.E, classifierWeights[turns]);
+	    	   else
+	    		   sum += dataWeights[i]*Math.pow(Math.E, -1.0*classifierWeights[turns]);
 	       }
 	       
+	       
+	     //update weights
 	       for(int i=0;i<insNum;i ++){
-	    	   weights[i] = 1.0*weights[i]/sum;
+	    	   if(errorindex.indexOf((Object)i) < 0){
+	    		   dataWeights[i] = dataWeights[i]*Math.pow(Math.E, -1.0*classifierWeights[turns])/sum;//todo
+	    	   }else{
+	    		   dataWeights[i] = dataWeights[i]*Math.pow(Math.E, 1.0*classifierWeights[turns])/sum;
+	    	   }
 	       }
-	       
-	       //System.out.println(Arrays.toString(weights));
+	      
     	}
+	      System.out.println(Arrays.toString(classifierWeights));
     }
 
     @Override
     public double predict(double[] features) {
     	
-    	double[] weight = new double[k];
+    	//double[] weight = new double[k];
     	double[] result = new double[k];
     	
     	for(int i=0;i<k;i ++){
-    		weight[i] = Math.log(1.0*(1-errors[i])/(errors[i]));
+    		//weight[i] = 0.5*Math.log1p(1.0*(1-errors[i])/(errors[i]));
     		result[i] = boost[i].predict(features);
     	}
 
@@ -127,9 +131,11 @@ public class AdaBoost extends Classifier {
     	for(int i=0;i<label.size();i ++){
     		for(int j=0;j<k;j ++){
     			if(result[j] == (double)label.get(i))
-    				prob[i] += weight[j];
+    				prob[i] += classifierWeights[j];
     		}
     	}
+    	
+    	//System.out.println(Arrays.toString(prob));
     	
     	int max=0;
     	for(int i=0;i<label.size();i ++){
