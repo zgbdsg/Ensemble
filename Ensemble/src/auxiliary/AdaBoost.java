@@ -24,7 +24,7 @@ public class AdaBoost extends Classifier {
 	double[] errors;
 	
     public AdaBoost() {
-    	k=2;
+    	k=10;
     	boost = new ADecisionTree[k];
     	errors = new double[k];
     	classifierWeights = new double[k];
@@ -106,7 +106,7 @@ public class AdaBoost extends Classifier {
 	       }
 	      
     	}
-	      System.out.println(Arrays.toString(classifierWeights));
+	      //System.out.println(Arrays.toString(classifierWeights));
     }
 
     @Override
